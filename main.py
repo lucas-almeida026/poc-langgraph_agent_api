@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from langgraph.graph import StateGraph, END
-from langchain.schema import HumanMessage, AIMessage
+from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
@@ -192,12 +192,13 @@ def call_llm(state: dict) -> dict:
     lc_messages = []
     for m in chat_messages:
         if m["role"] == "system":
-            lc_messages.append(HumanMessage(content=m["content"]))  # LangChain doesn't have SystemMessage, so prepend as HumanMessage
+            lc_messages.append(SystemMessage(content=m["content"]))
         elif m["role"] == "user":
             lc_messages.append(HumanMessage(content=m["content"]))
         elif m["role"] == "assistant":
             lc_messages.append(AIMessage(content=m["content"]))
 
+    print(f"LLM messages: {lc_messages}")
     response = llm.invoke(lc_messages)
     state["output"] = response.content
 
@@ -557,4 +558,4 @@ if __name__ == "__main__":
         print("  python main.py rag list <agent_id> - list RAG documents for an agent")
 
 # Jeferson ag_4635b53d-301a-4bc8-a99e-c2dd61e2ac8b
-# th_280cbe60-eaec-4ee6-8859-c883eabfc4f6
+# th_e894d87a-32ec-4fbd-9349-339c4a00ddbb
